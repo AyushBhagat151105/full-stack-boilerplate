@@ -8,6 +8,8 @@
     "lint": "tsc -p convex && eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
+    "@auth/core": "0.37.0",
+    "@convex-dev/auth": "^0.0.87",
     "convex": "^1.23.0"
   },
   "overrides": {

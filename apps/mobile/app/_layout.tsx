@@ -8,9 +8,10 @@ import { Appearance, Platform, View } from 'react-native';
 import { NAV_THEME } from '~/lib/constants';
 import { useColorScheme } from '~/lib/useColorScheme';
 import { PortalHost } from '@rn-primitives/portal';
-import { ThemeToggle } from '~/components/ThemeToggle';
 import { setAndroidNavigationBar } from '~/lib/android-navigation-bar';
-import { ConvexProvider, ConvexReactClient } from "convex/react";
+import { ConvexReactClient } from "convex/react";
+import { ConvexAuthProvider } from "@packages/backend";
+import * as SecureStore from "expo-secure-store";
 
 const LIGHT_THEME: Theme = {
   ...DefaultTheme,
@@ -33,7 +34,11 @@ const usePlatformSpecificSetup = Platform.select({
 });
 
 
-
+const secureStorage = {
+  getItem: SecureStore.getItemAsync,
+  setItem: SecureStore.setItemAsync,
+  removeItem: SecureStore.deleteItemAsync,
+};
 
 const convex = new ConvexReactClient(process.env.EXPO_PUBLIC_CONVEX_URL!, {
   unsavedChangesWarning: false,
@@ -44,21 +49,21 @@ export default function RootLayout() {
   const { isDarkColorScheme } = useColorScheme();
 
   return (
-    <ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
-      <StatusBar style={isDarkColorScheme ? 'light' : 'dark'} />
-      <ConvexProvider client={convex}>
-        <Stack>
-          <Stack.Screen
-            name='index'
-            options={{
-              title: 'Starter Base',
-              headerRight: () => <ThemeToggle />,
-            }}
-          />
+    <ConvexAuthProvider client={convex}
+      storage={
+        Platform.OS === "android" || Platform.OS === "ios"
+          ? secureStorage
+          : undefined
+      }
+    >
+      <ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
+        <StatusBar style={isDarkColorScheme ? 'light' : 'dark'} />
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack />
         </Stack>
-      </ConvexProvider>
-      <PortalHost />
-    </ThemeProvider>
+        <PortalHost />
+      </ThemeProvider>
+    </ConvexAuthProvider>
   );
 }
 
