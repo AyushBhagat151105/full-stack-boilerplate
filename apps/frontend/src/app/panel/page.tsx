@@ -3,6 +3,7 @@ import { useQuery } from "convex/react";
 import { api, useAuthToken } from "@packages/backend";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Tasks from "@/components/Tasks";
 
 export default function PanelPage() {
     const token = useAuthToken();
@@ -45,8 +46,11 @@ export default function PanelPage() {
                 {identity.name ?? "User"}
             </h1>
             {identity.email && (
-                <p className="text-gray-700 text-base">{identity.email}</p>
+                <p className="text-gray-700 text-base mb-6">{identity.email}</p>
             )}
+
+            {/* Tasks UI */}
+            <Tasks />
         </div>
     );
 }
